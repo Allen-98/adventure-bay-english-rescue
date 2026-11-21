@@ -1,0 +1,23 @@
+.mission-card:disabled{background:#edf2f2;box-shadow:0 2px 0 #cdd8d7;color:#4d666d}
+.mission-card:disabled .thumb{filter:grayscale(.78);opacity:.60}
+.mission-card:disabled .card-tag,.mission-card:disabled .card-copy small{color:#54696e}
+.mission-card:disabled .card-next{color:#54696e}
+.game-hub{display:inline-block;margin-top:20px;color:#345a6c;font-size:14px}
+.game-hub[hidden]{display:none}
+.path-group{margin:16px 0}
+.path-group h3{margin:0 0 7px;font-size:17px}
+.path-group small{font-size:12px;font-weight:500;color:#526e76}
+.path-steps{display:flex;flex-wrap:wrap;gap:6px}
+.path-steps button{display:inline-flex;align-items:center;gap:5px;min-height:41px;border-radius:10px;padding:6px 9px;border:1px solid #958343;background:#ffdf87;color:#3a351a;font-weight:700}
+.path-steps button:disabled{background:#edf1ef;border-color:#d4dcd8;color:#596c70}
+.path-steps button.earned{background:#ddf2e9;color:#17655b;border-color:#a5cfc3}
+.path-steps svg{width:15px;height:15px}
+.vocab-scene{height:100%;display:flex;align-items:center;justify-content:space-around;flex-direction:column;gap:7px;background-size:cover;background-position:center;padding:clamp(8px,3vh,32px) 3vw}
+.vocab-heading,.vocab-footer{background:#fffbedf7;border-radius:17px;color:#17425b;text-align:center;padding:9px 19px;box-shadow:0 3px 0 #24557549}
+.vocab-heading small{color:#366b73}.vocab-heading h2{font-size:clamp(21px,3.5vw,40px);margin:0}
+.vocab-options{display:flex;justify-content:center;align-items:center;gap:clamp(12px,5vw,80px);width:100%;min-height:0}
+.vocab-object{position:relative;display:grid;place-items:center;width:min(38vw,31vh,300px);aspect-ratio:1;min-width:76px;border:3px solid #fff;border-radius:20%;background:linear-gradient(#f5fff9,#c5eced);box-shadow:0 5px 0 #317f93}
+.vocab-object img{width:85%;height:80%;object-fit:contain}
+.vocab-object span{position:absolute;bottom:4%;right:8%;background:#fff8e7;color:#155263;border-radius:10px;padding:2px 9px;font-weight:800}
+.vocab-footer p{margin:2px 0;font-weight:bold}.vocab-footer .go{margin-top:7px}
+@media (orientation:landscape) and (max-height:570px){.vocab-scene{gap:3px;padding:4px 3vw}.vocab-heading,.vocab-footer{padding:4px 12px}.vocab-heading small{display:none}.vocab-footer p{font-size:13px}.vocab-object{width:min(26vw,33vh)}}

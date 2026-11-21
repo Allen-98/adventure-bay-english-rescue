@@ -1,4 +1,5 @@
 const paths = {
+  lock:'<rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/>',
   sound:'<path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>',
   mute:'<path d="M3 9h4l5-4v14l-5-4H3z"/><path d="m16 9 6 6m0-6-6 6"/>',
   book:'<path d="M3 4h6c2 0 3 1.5 3 3 0-1.5 1-3 3-3h6v15h-6c-1.7 0-3 1-3 2-1-1.5-2-2-4-2H3z"/><path d="M12 7v13"/>',

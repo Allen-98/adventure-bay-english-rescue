@@ -21,7 +21,7 @@ const missionInfo = {
   colors: ['红蓝引航船', '路马'],
   radio: ['空中的小电台', '天天']
 };
-const sampleText = {a:'A', b:'B', red:'Red', blue:'Blue', duck:'The duck', cat:'The cat', is:'is', inBoat:'in the boat', onDock:'on the dock'};
+const sampleText = {red:'Red', blue:'Blue', duck:'The duck', cat:'The cat', is:'is', inBoat:'in the boat', onDock:'on the dock'};
 const animalName = {duck:'小鸭', cat:'小猫'};
 const placeName = {inBoat:'船里', onDock:'码头上'};
 const sentenceKey = {
@@ -29,8 +29,11 @@ const sentenceKey = {
   cat: {inBoat:'catBoat', onDock:'catDock'}
 };
 
-export function startMission({id, root, speak, stopAudio, finish, art, saved, record}) {
+export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, finish, art, saved, record}) {
   if (!missionInfo[id]) throw new Error('Unknown mission: ' + id);
+  if (id === 'letters' && (!Array.isArray(pair) || pair.length !== 2 || pair[0] === pair[1] || !pair.every(v=>typeof v === 'string' && /^[a-z]$/.test(v)))) {
+    throw new Error('A letter lesson requires two different lowercase letters.');
+  }
   const visits = Number(saved?.visits || 0);
   const world = document.createElement('section');
   world.className = 'ms-world ms-' + id;
@@ -56,8 +59,10 @@ export function startMission({id, root, speak, stopAudio, finish, art, saved, re
   const words = ['', '', ''];
   const radioMap = visits % 2 ? {cat:'inBoat', duck:'onDock'} : {duck:'inBoat', cat:'onDock'};
   const colors = visits % 2 ? ['blue', 'red'] : ['red', 'blue'];
-  const letterOrder = visits % 2 ? ['b','a'] : ['a','b'];
-  const letterCalls = [1,2].includes(visits % 4) ? ['b','a'] : ['a','b'];
+  const reversePair = id === 'letters' ? [pair[1], pair[0]] : [];
+  const practiceLanes = visits % 2 ? reversePair : pair;
+  const listeningLanes = visits % 2 ? pair : reversePair;
+  const letterCalls = id === 'letters' ? [...pair, ...(Math.random() < .5 ? pair : reversePair)] : [];
   let currentAudio = [];
 
   function image(name, className = '') {
@@ -135,7 +140,7 @@ export function startMission({id, root, speak, stopAudio, finish, art, saved, re
     return id === 'letters' ? letterCalls[round] : [colors[0], colors[0], colors[1]][round];
   }
   function lanes() {
-    if (id === 'letters') return letterOrder;
+    if (id === 'letters') return round < 2 ? practiceLanes : listeningLanes;
     if (phase === 'explore' || round === 0) return ['red','blue'];
     return ['blue','red'];
   }
@@ -144,30 +149,35 @@ export function startMission({id, root, speak, stopAudio, finish, art, saved, re
     if (phase === 'bell') return '小队到齐！按船铃回塔。';
     if (phase === 'board') return '找到啦！放下踏板接它上船。';
     if (phase === 'boarding') return '踏板放好啦，小伙伴正在上船。';
-    if (phase === 'moving') return id === 'colors' ? '引航灯亮了，小船正在靠岸。' : '路马出发，靠岸接朋友！';
+    if (phase === 'moving') {
+      if (id === 'colors') return '引航灯亮了，小船正在靠岸。';
+      return round < 2 ? '浮台的灯亮啦！' : '路马出发，靠岸接朋友！';
+    }
     if (phase === 'look') return '天天去看看，听听现场回报。';
-    if (id === 'letters') return phase === 'model' ? '这是 B，看看它的样子。' : visits === 0 && round === 0 ? '跟着字母 A，点亮浮台。' : '听电台，点亮呼叫的浮台。';
+    if (id === 'letters') return round < 2 ? '听听 '+target().toUpperCase()+'，点亮它的浮台。' : '听电台，找到呼叫的浮台。';
     if (id === 'colors') return phase === 'explore' ? '点一点两艘船，听听颜色。' : '听请求，点亮那艘船的引航灯。';
     if (words.every(Boolean)) return '消息组好了，点对讲机发送。';
     return ['谁在等我们？先选一位小伙伴。','点连接词，把消息接起来。','它在哪里？选一个地点。'][slot];
   }
   function heroPanel() {
-    const total = id === 'colors' ? 4 : 2;
+    const total = id === 'radio' ? 2 : 4;
     let progress = id === 'colors' ? (phase === 'explore' ? 0 : round + 1) : id === 'radio' ? aboard.size : round;
     if (phase === 'bell') progress = total;
     const dots = Array.from({length:total}, (_, i) => '<i class="' + (i < progress ? 'done' : i === progress ? 'now' : '') + '"></i>').join('');
-    return '<header class="ms-scene-head"><div class="ms-area-mark">' + glyph('pin') + '<span>冒险湾码头</span></div><h2>' + missionInfo[id][0] + '</h2><div class="ms-progress" aria-label="任务进度 ' + progress + ' / ' + total + '">' + dots + '</div></header>';
+    const label=id==='letters'?'字母浮台 · '+pair.join(' / ').toUpperCase():'冒险湾码头';
+    return '<header class="ms-scene-head"><div class="ms-area-mark">' + glyph('pin') + '<span>'+label+'</span></div><h2>' + missionInfo[id][0] + '</h2><div class="ms-progress" aria-label="任务进度 ' + progress + ' / ' + total + '">' + dots + '</div></header>';
   }
   function speechLine() {
     return '<div class="ms-speech" aria-live="polite"><span class="ms-portrait">' + image(id === 'radio' ? 'skye':'zuma') + '</span><div><small>' + missionInfo[id][1] + ' · 现场电台</small><strong>' + stageInstruction() + '</strong></div></div>';
   }
   function letterWorld() {
     return '<div class="ms-lanes">' + lanes().map((v, i) => {
-      const lit = (phase === 'moving' && destination === v) || aboard.has(v);
+      const lit = phase === 'moving' && destination === v;
       const active = phase === 'choose';
-      const guided = ((active && ((visits === 0 && round === 0) || showHint)) || phase === 'model') && target() === v;
-      const fog = visits > 0 && !lit;
-      return '<button type="button" class="ms-buoy ms-lane ms-lane-' + i + (lit ? ' lit':'') + (guided ? ' guide':'') + (lastChoice === v ? ' inspect':'') + '" data-act="choose" data-v="' + v + '" aria-label="浮台 ' + sampleText[v] + '"' + (!active?' disabled':'') + '><span class="ms-beam"></span><span class="ms-buoy-light"></span><b class="ms-letter">' + sampleText[v] + '</b><span class="ms-float"><i></i></span>' + (fog ? '<i class="ms-mist"></i>' : !aboard.has(v) ? image('duck','ms-buoy-duck'):'') + '</button>';
+      const guided = active && (round < 2 || showHint) && target() === v;
+      const fog = round >= 2 && !lit && phase !== 'bell';
+      const letter = v.toUpperCase();
+      return '<button type="button" class="ms-buoy ms-lane ms-lane-' + i + (lit ? ' lit':'') + (guided ? ' guide':'') + (lastChoice === v ? ' inspect':'') + '" data-act="choose" data-v="' + v + '" aria-label="浮台 ' + letter + '"' + (!active?' disabled':'') + '><span class="ms-beam"></span><span class="ms-buoy-light"></span><b class="ms-letter">' + letter + '</b><span class="ms-float"><i></i></span>' + (fog ? '<i class="ms-mist"></i>' : !aboard.has(v) ? image('duck','ms-buoy-duck'):'') + '</button>';
     }).join('') + '</div>';
   }
   function colorWorld() {
@@ -256,26 +266,20 @@ export function startMission({id, root, speak, stopAudio, finish, art, saved, re
       setupHint();
       return;
     }
-    observe((id === 'letters'?'letter-':'color-') + (id === 'letters'?v.toUpperCase():v), sampleText[v], id === 'letters' && visits === 0);
+    if (id === 'letters') observe('letter-'+v.toUpperCase(),v.toUpperCase(),round<2);
+    else observe('color-'+v,sampleText[v]);
     phase = 'moving';
     destination = v;
     crewX = lanes().indexOf(v) === 0 ? 32 : 68;
     draw();
     narrate(v);
     schedule(1350, () => {
-      if (id === 'letters') aboard.add(v);
-      if (round === (id === 'letters' ? 1 : 2)) return setReady();
+      if (id === 'letters' && round >= 2) aboard.add(v);
+      if (round === (id === 'letters' ? 3 : 2)) return setReady();
       transition(); round++; phase = 'choose'; destination=''; crewX=50;
-      if (id === 'letters' && visits === 0) {
-        phase = 'model';
-        draw(); narrate('b');
-        schedule(1200, () => {
-          transition(); phase = 'choose'; draw(); narrate(['letterListen','b']); setupHint();
-        });
-        return;
-      }
       draw();
-      narrate(id === 'letters'?['letterListen',target()]:['colorListen', target()+'Boat']);
+      if (id === 'letters') narrate(round===2 ? ['cnTryLetter',target()] : target());
+      else narrate(['colorListen', target()+'Boat']);
       setupHint();
     });
   }
@@ -373,7 +377,7 @@ export function startMission({id, root, speak, stopAudio, finish, art, saved, re
   }
   world.addEventListener('click',click);
   draw();
-  narrate(id === 'letters'?['letterIntro',target()]:id === 'colors'?'colorIntro':['radioIntro',sentenceKey.duck[radioMap.duck]]);
+  narrate(id === 'letters'?['cnPracticeLetter',target()]:id === 'colors'?'colorIntro':['radioIntro',sentenceKey.duck[radioMap.duck]]);
   setupHint();
   return {replay, dispose};
 }
