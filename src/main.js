@@ -6,12 +6,13 @@ import { createAudio } from './audio.js';
 import { harborView } from './harbor.js';
 import { icon, crest } from './icons.js';
 
-import { chapters, missions, restoreProgress, nextMission, unlocked, chapterTasks, saveKey, legacyKey } from './learning-path.js';
+import { chapters, missions, restoreProgress, nextMission, unlocked, chapterTasks, applyCredits, saveKey, previousKey, legacyKey } from './learning-path.js';
+import {topics} from './word-lessons.js';
 import { startVocabulary } from './vocabulary.js';
 import './path.css';
 
 function read(key){try{return JSON.parse(localStorage.getItem(key));}catch{return null;}}
-function load(){return restoreProgress(read(saveKey),read(legacyKey));}
+function load(){return restoreProgress(read(saveKey)??read(previousKey),read(legacyKey));}
 let save=load();
 function persist(){try{localStorage.setItem(saveKey,JSON.stringify(save));}catch{}}
 const main=document.querySelector('#main');
@@ -67,7 +68,7 @@ function chapterCard(c,index){
   const first=tasks.find(m=>!save.completed[m.id])||tasks[0];
   const accessible=unlocked(save,first.id);
   const done=tasks.filter(m=>save.completed[m.id]).length;
-  const state=accessible?(done===tasks.length?'已完成 · 可复习':'下一关 · '+first.name):['','完成 A–Z 后解锁','完成 3 个单词任务后解锁'][index];
+  const state=accessible?(done===tasks.length?'已完成 · 可复习':'下一关 · '+first.name):['','完成 A–Z 后解锁','完成 '+chapterTasks('words').length+' 个单词任务后解锁'][index];
   return '<button class="mission-card" data-mission="'+first.id+'" '+(accessible?'':'disabled')+'>'+preview(['letters','colors','radio'][index])+'<span class="card-copy"><span class="card-tag">阶段 '+(index+1)+' · '+done+'/'+tasks.length+'</span><strong>'+c.name+'</strong><small>'+state+'</small></span><span class="card-next">'+icon(accessible?'chevron':'lock')+'</span></button>';
 }
 function home() {
@@ -85,7 +86,7 @@ function dispatch(m){
   if(!m || !unlocked(save,m.id)) return;
   if(book.open)book.close();
   discard();stage='dispatch';current=m;notes=[];header();window.scrollTo(0,0);
-  main.innerHTML='<section class="call-scene"><div class="harbor-stage"></div><div class="call-layout"><div class="dispatch-card"><div class="incoming"><span class="live-dot"></span>码头来电</div><div class="dispatch-avatar">'+image(m.id==='radio'?'skye':'zuma')+'</div><h1>'+m.name+'</h1><p>'+m.cue+'</p><button class="go" data-ui="launch">'+icon('flag')+'出动！'+icon('arrow')+'</button></div></div></section>';
+  main.innerHTML='<section class="call-scene"><div class="harbor-stage"></div><div class="call-layout"><div class="dispatch-card"><div class="incoming"><span class="live-dot"></span>码头来电</div><div class="dispatch-avatar">'+image(m.topic==='family'?'family-mimi':m.id==='radio'?'skye':'zuma')+'</div><h1>'+m.name+'</h1><p>'+m.cue+'</p><button class="go" data-ui="launch">'+icon('flag')+'出动！'+icon('arrow')+'</button></div></div></section>';
   world=harborView(main.querySelector('.harbor-stage'),art,reduced());
   audio.speak(m.call);
 }
@@ -98,15 +99,16 @@ function launch(){
 function field(){
   discard();stage='mission';header();main.innerHTML='<section id="field" aria-label="救援现场"></section>';
   const start=current.kind==='vocabulary'?startVocabulary:startMission;
-  run=start({id:current.kind==='vocabulary'?current.id:current.kind,pair:current.pair,root:main.firstElementChild,art,saved:{completed:{...save.completed},visits:save.completed[current.id]},speak:key=>audio.speak(key),stopAudio:()=>audio.stop(),finish:finishMission,
+  run=start({id:current.kind,lesson:current,pair:current.pair,root:main.firstElementChild,art,saved:{completed:{...save.completed},visits:save.completed[current.id]},speak:key=>audio.speak(key),stopAudio:()=>audio.stop(),finish:finishMission,
     record:(key,detail)=>notes.push({key,value:String(detail?.value||''),independent:detail?.independent===true})});
 }
 function finishMission(){
   if(stage!=='mission')return;
-  discard();stage='done';save.completed[current.id]++;
+  discard();stage='done';const firstCompletion=!save.completed[current.id];save.completed[current.id]++;
+  applyCredits(save);
   save.history.push({id:current.id,actions:notes.length,independent:notes.filter(n=>n.independent).length,last:notes.at(-1)});
   save.history=save.history.slice(-15);persist();header();
-  const after=missions[missions.indexOf(current)+1];
+  const after=firstCompletion?nextMission(save):missions[missions.indexOf(current)+1];
   main.innerHTML='<section class="done-view"><div class="done-card"><span class="badge big">'+icon(current.symbol)+'</span><p class="done-caption">救援完成</p><h1>'+current.badge+'</h1><p>'+(after?'下一关 · '+after.name:'队长完成了全部 '+missions.length+' 个任务！')+'</p>'+(after?'<button class="go" data-mission="'+after.id+'">'+icon('radio')+'接下一关</button>':'<button class="go" data-ui="home">'+icon('home')+'回到基地</button>')+'<button class="quiet" data-ui="again">'+icon('replay')+'再玩一次</button></div></section>';
   main.querySelector('.done-view').style.backgroundImage='url("'+art('harbor')+'")';audio.speak('missionDone');
 }
@@ -114,7 +116,12 @@ function openBook(){
   returnFocus=document.activeElement;
   const last=save.history.at(-1);
   const lastMission=missions.find(m=>m.id===last?.id);
-  const groups=chapters.map(c=>'<section class="path-group"><h3>'+c.name+' <small>'+c.summary+'</small></h3><div class="path-steps">'+chapterTasks(c.id).map(m=>'<button data-mission="'+m.id+'" '+(unlocked(save,m.id)?'':'disabled')+' class="'+(save.completed[m.id]?'earned':'')+'">'+icon(save.completed[m.id]?'check':unlocked(save,m.id)?'flag':'lock')+(m.kind==='letters'?m.english:m.name)+'</button>').join('')+'</div></section>');
+  const steps=tasks=>'<div class="path-steps">'+tasks.map(m=>'<button data-mission="'+m.id+'" '+(unlocked(save,m.id)?'':'disabled')+' class="'+(save.completed[m.id]?'earned':'')+'">'+icon(save.completed[m.id]?'check':unlocked(save,m.id)?'flag':'lock')+(m.kind==='letters'?m.english:m.name)+'</button>').join('')+'</div>';
+  const groups=chapters.map(c=>{
+    const tasks=chapterTasks(c.id);
+    const content=c.id==='words'?Object.entries(topics).map(([id,topic])=>'<h4>'+topic.name+'</h4>'+steps(tasks.filter(m=>m.topic===id))).join(''):steps(tasks);
+    return '<section class="path-group"><h3>'+c.name+' <small>'+c.summary+'</small></h3>'+content+'</section>';
+  });
   book.innerHTML='<div class="book-top"><span>'+icon('book')+'队长的救援手册</span><button class="round-control" data-ui="close" aria-label="关闭手册">'+icon('close')+'</button></div><h2>我的学习路线</h2><p>按顺序完成救援。已完成的任务可以随时重玩。</p>'+groups.join('')+'<div class="parent-note"><b>陪玩小记</b><p>从 A、B 开始，每次认识两个字母，再帮路马听音辨认。</p></div>';
   book.showModal();
   if (lastMission && last?.last?.value) {
