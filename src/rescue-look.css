@@ -1,0 +1,65 @@
+/* Adventure Bay uses the same sunlit 3D cast as the running game. */
+:root {--paper:#eef7f5;--ink:#18405a;--teal:#096a89;--line:#c2d7da}
+body {background:radial-gradient(ellipse at 92% 0,#d0eee8,transparent 62%),#eff7f5}
+#mast {background:transparent;border-color:transparent}
+.identity b {color:#134965}.identity small {color:#467994}
+.round-control {background:#fff;border:2px solid #d0e3e7;box-shadow:0 2px 0 #b6d5dc}
+.head-btn {color:#235872}
+.hero {margin:0 auto;width:calc(100% - clamp(28px,7.7vw,116px));max-width:1500px;border:4px solid #fff;border-radius:28px;box-shadow:0 7px 0 #c3dcd9,0 14px 26px #054a6d0c}
+.hero-inner {padding-left:clamp(25px,4.4vw,80px)}
+.harbor-stage {background-position:center 15%}
+.hero-wash {z-index:0;background:linear-gradient(90deg,#092e4bed 0%,#073853c9 20%,#09496077 39%,#11597905 66%)}
+.hero h1 {color:#fff9dd;text-shadow:0 3px 0 #0a415c,0 6px 12px #09365455}
+.hero h1 em {color:#ffda6c}
+.hero-inner p {color:#fff9e6;text-shadow:0 1px 3px #163c55;font-weight:650}
+.chapter {color:#cceeee}
+.chapter .live-dot {background:#ffcf53;border:2px solid #ffea91;box-shadow:0 0 9px #ffd64688}
+.go {background:linear-gradient(#ffe397,#ffca52 68%,#f6b841);border:2px solid #fff1be;box-shadow:0 4px 0 #b57b24,0 7px 14px #13435930;color:#4e381a}
+.go:hover {background:linear-gradient(#fff0bc,#ffd260 70%,#fbc047)}
+.call-sign {color:#fff;background:#134964c9;backdrop-filter:blur(7px)}
+.missions {max-width:1600px;padding-left:clamp(16px,4.35vw,88px);padding-right:clamp(16px,4.35vw,88px)}
+.mission-card {border:2px solid #fff;box-shadow:0 3px 0 #c6dad9;background:#fffffa}
+.thumb {border-right:1px solid #cedfd6}
+.is-letters,.is-colors {background-image:linear-gradient(180deg,#b7f4ff35,transparent),var(--bay-postcard);background-size: auto,auto 125%;background-position:center,5% 68%}
+.is-radio {background:radial-gradient(circle at 55% 29%,#fff2e6,#f2d4cd 48%,#dfacae)}
+.card-buoy {position:absolute;left:0;bottom:8%;width:78%;aspect-ratio:800/643}
+.card-buoy img {inset:0;width:100%;height:100%}
+.card-buoy b {position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font:900 clamp(12px,1.4vw,27px)/1 Arial;color:#194769}
+.card-duck {width:53%;height:73%;right:0;bottom:2%}
+.tiny-blue {width:72%;height:63%;top:3%;right:-2%}
+.tiny-red {width:83%;height:70%;left:-4%;bottom:0}
+.card-skye {width:106%;height:145%;bottom:-53%;left:-3%;object-position:center top}
+.radio-wave {opacity:.62}
+.card-tag {color:#33788c}
+.dispatch-card,.done-card,#book {border:3px solid white;box-shadow:0 5px 0 #9dbfc4,0 8px 22px #1252752b}
+.dispatch-avatar {border:3px solid #e4f6ff;background:radial-gradient(ellipse at 33% 18%,#f7f9df,#b9e4e9 74%,#86bed5)}
+.dispatch-avatar img {height:134%;width:134%;margin-left:-17%;object-position:center top}
+.ms-world .ms-scene-head {background:linear-gradient(120deg,#fffdf2f7,#f6ffffdc);border-radius:8px 19px 19px 19px;padding:.6em 1.05em .75em;border:2px solid #fff9;box-shadow:0 3px 0 #27617c33}
+.ms-scene-head h2 {font-size:clamp(21px,4.85cqh,37px);color:#15476c}
+.ms-world .ms-speech {box-shadow:0 4px 0 #36697a66,0 8px 16px #13456226}
+.ms-letters::before {content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,transparent 6%,#e6f8ff36 23%,#effafc7a 36%,#e6ffff29 49%,transparent 63%)}
+.ms-world .ms-portrait {background:radial-gradient(circle at 40% 20%,#f4fcf2,#b8dcef);overflow:hidden}
+.ms-world .ms-portrait img {width:132%;height:132%;object-position:center top;margin-left:-16%}
+.ms-radio .ms-location-object,.ms-color-boat img {filter:drop-shadow(0 5px 3px #0d5d8033)}
+.ms-world .ms-console {background:linear-gradient(152deg,#225774,#123b5b);border-color:#b4e0e7}
+.ms-world .ms-buoy {width:min(22cqw,38cqh);height:auto;aspect-ratio:800/643;bottom:36%;background-image:var(--buoy-art);background-size:contain;background-position:center;background-repeat:no-repeat}
+.ms-buoy .ms-float {display:none}
+.ms-world .ms-buoy .ms-letter {inset:auto;left:50%;top:38%;transform:translate(-50%,-50%);border:0;outline:0;box-shadow:none;background:none;border-radius:0;height:auto;font:900 min(5.9cqw,10.1cqh)/1 Arial,sans-serif;color:#123d5a;text-shadow:0 1px 1px #fff}
+.ms-buoy .ms-buoy-light {position:absolute;left:49%;bottom:auto;top:11%;height:9%;width:14%;transform:translate(-50%,-50%);border:0;background:transparent;box-shadow:none;border-radius:50%}
+.ms-buoy.lit .ms-buoy-light,.ms-buoy.guide .ms-buoy-light {background:#fff7bdc9;box-shadow:0 0 10px 4px #ffe781}
+.ms-buoy .ms-beam {bottom:88%;height:58%}
+.ms-world .ms-buoy img.ms-buoy-duck {width:43%;height:47%;right:0;bottom:26%}
+@container (max-aspect-ratio:4/5) {
+  .ms-world .ms-buoy {width:42cqw;bottom:42%}
+  .ms-world .ms-buoy .ms-letter {font-size:11cqw}
+}
+@media(max-height:570px) and (orientation:landscape) {
+  .hero{border-radius:16px;border-width:2px;width:94%}
+  .ms-world .ms-scene-head{padding:5px 9px 6px}.ms-scene-head h2{font-size:18px}
+}
+@media(max-width:620px) and (orientation:portrait) {
+  .hero{width:calc(100% - 16px);border-width:3px;border-radius:22px}
+  .hero-inner{padding-left:5%}
+  .hero-wash{background:linear-gradient(115deg,#0b3858e8 0%,#174561a8 34%,#16547311 65%)}
+  .call-sign{font-size:10px}.hero-boat{right:-2%;width:86%;height:58%;bottom:1%}
+}

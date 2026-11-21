@@ -1,0 +1,231 @@
+.ms-world {
+  --ms-ink: #163859;
+  --ms-cream: #fff9eb;
+  --ms-yellow: #ffd662;
+  --ms-teal: #087f83;
+  position: relative;
+  isolation: isolate;
+  container-type: size;
+  width: 100%;
+  height: 100%;
+  min-height: 230px;
+  overflow: hidden;
+  background-color: #8ddce6;
+  background-size: cover;
+  background-position: center;
+  color: var(--ms-ink);
+  font-family: "Arial Rounded MT Bold", "Microsoft YaHei UI", system-ui, sans-serif;
+}
+.ms-world *, .ms-world *::before, .ms-world *::after {box-sizing: border-box}
+.ms-world button {
+  color: inherit;
+  font: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.ms-world button:disabled {opacity: 1; cursor: default}
+.ms-world button:focus-visible {outline: 4px solid #12395f; outline-offset: 4px}
+.ms-world img {display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none}
+.ms-icon {display: inline-block; width: 1.35em; height: 1.35em; flex: none; vertical-align: middle}
+.ms-scene-head {position: absolute; z-index: 3; top: 5%; left: 5%; pointer-events: none}
+.ms-area-mark {display: flex; align-items: center; gap: .4em; font-size: clamp(11px, 1.5cqw, 15px); color: #175b75; font-weight: 750}
+.ms-area-mark .ms-icon {width: 1em; height: 1em}
+.ms-scene-head h2 {margin: .2em 0 .32em; font-size: clamp(22px, 5.6cqh, 44px); letter-spacing: -.07em; line-height: 1.22; color: #133855; text-shadow: 0 2px #fffa}
+.ms-progress {display: flex; align-items: center; gap: 4px}
+.ms-progress i {width: clamp(15px, 2.4cqw, 28px); height: 4px; border-radius: 5px; background: #32638142}
+.ms-progress .now {background: #187c88}
+.ms-progress .done {background: #f6ad32}
+.ms-lanes, .ms-position-scene {position: absolute; inset: 0; pointer-events: none}
+.ms-lane {
+  position: absolute;
+  z-index: 3;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 18%;
+}
+.ms-lane-0 {left: 27%}
+.ms-lane-1 {left: 73%}
+.ms-lane > * {pointer-events: none}
+.ms-buoy {
+  width: min(17cqw, 28cqh);
+  height: min(24cqw, 34cqh);
+  bottom: 38%;
+  filter: drop-shadow(0 8px 6px #185c6c2b);
+}
+.ms-letter {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  left: 16%;
+  right: 16%;
+  top: 20%;
+  bottom: 22%;
+  border: clamp(3px,.7cqw,7px) solid #1c6772;
+  border-radius: 24%;
+  box-shadow: inset 0 -5px 0 #e0ca96, inset 0 3px 0 #fff, 0 4px 0 #124755;
+  background: #fff4d7;
+  color: #183e56;
+  text-shadow: 0 2px #fff;
+  font: 900 min(10.5cqw,15.8cqh)/.9 "Arial Rounded MT Bold","Arial",sans-serif;
+}
+.ms-float {
+  position: absolute;
+  z-index: 3;
+  left: 3%; right: 3%; bottom: 7%; height: 18%;
+  background: repeating-linear-gradient(112deg,#f28439 0 17%,#ffe8bd 17% 27%);
+  border: 3px solid #6f5746;
+  border-top-color: #fff0c7;
+  border-radius: 17% 17% 40% 40% / 40% 40% 65% 65%;
+  box-shadow: inset 0 -5px 0 #9358314d,0 5px 0 #80e1de7d;
+}
+.ms-buoy-light {position: absolute; z-index: 3; width: 18%; height: 17%; bottom: 79%; left: 41%; border: 3px solid #346575; background: #b0dbd5; border-radius: 40% 40% 12% 12%; box-shadow: inset 2px 2px #eff7ec,0 3px #427182}
+.ms-beam {position: absolute; left: 0; bottom: 84%; height: 70%; width: 100%; clip-path: polygon(0 0,100% 0,53% 100%,47% 100%); background: linear-gradient(transparent,#fff799); opacity: 0}
+.ms-buoy.lit .ms-beam {opacity: .95}
+.ms-buoy.lit .ms-buoy-light,.ms-buoy.guide .ms-buoy-light {background: #ffe779;box-shadow: 0 0 18px 6px #fff392cc}
+.ms-buoy img.ms-buoy-duck {position: absolute; z-index: 4; width: 47%; height: 45%; right: -20%; bottom: 7%}
+.ms-mist {position:absolute;z-index:4;right:-23%;bottom:8%;width:53%;height:20%;background:#dbefeb;opacity:.85;border-radius:60%;box-shadow:7px -5px 5px #def5ef,-6px 4px 7px #c7e9eb;filter:blur(3px)}
+.ms-buoy.inspect .ms-letter {animation: ms-tap .45s ease}
+.ms-buoy.guide .ms-letter, .ms-word.guide {outline: 4px solid #ffcf4a; outline-offset: 3px}
+.ms-buoy:active:not(:disabled) .ms-letter {scale: .96}
+.ms-color-boat {width: min(29cqw,47cqh); height: min(22cqw,31cqh); bottom: 36%}
+.ms-color-boat .ms-hull {filter: drop-shadow(0 8px 4px #14516e33)}
+.ms-color-boat .ms-boat-sound {
+  position: absolute;
+  right: 11%;
+  top: 2%;
+  display: grid;
+  place-items: center;
+  width: clamp(28px,4.1cqw,50px);
+  aspect-ratio: 1;
+  border: 3px solid #fff4d5;
+  border-radius: 50%;
+  background: #17627b;
+  box-shadow: 0 3px #2a52634a;
+  color: #fff;
+}
+.ms-color-boat.guide .ms-boat-sound, .ms-color-boat.sailing .ms-boat-sound {background: var(--ms-yellow); color: var(--ms-ink); box-shadow: 0 0 20px 6px #ffef8b}
+.ms-color-boat.sailing .ms-hull {animation: ms-moor 1.3s both}
+.ms-crew {position: absolute; z-index: 4; left: var(--crew-x); transform: translateX(-50%); width: min(30cqw,47cqh); height: min(22cqw,33cqh); bottom: 13%; pointer-events: none; animation: ms-arrive .9s ease-in-out both}
+.ms-crew img.ms-crew-boat {filter: drop-shadow(0 7px 3px #15677a42)}
+.ms-crew .ms-rider {position: absolute; z-index: 3; width: 20%; height: 24%; top: 50%; left: 24%}
+.ms-crew .rider-1 {left: 38%;top: 54%}
+.ms-controls {position: absolute; z-index: 5; left: 5%; right: 5%; bottom: 4%; display: flex; align-items: center; gap: 12px; justify-content: center; pointer-events: none}
+.ms-controls button {pointer-events: auto}
+.ms-speech {
+  display: flex;
+  align-items: center;
+  gap: clamp(7px,1.3cqw,16px);
+  padding: 6px clamp(13px,2.4cqw,26px) 6px 7px;
+  border: 2px solid #fffffff5;
+  border-radius: 16px 22px 22px 16px;
+  color: #183e56;
+  background: var(--ms-cream);
+  box-shadow: 0 4px 0 #29556547,0 8px 22px #17465f14;
+}
+.ms-speech small {display: block; font-weight: 750; color: #237073; font-size: clamp(10px,1.35cqw,13px); margin-bottom: .16em}
+.ms-speech strong {display: block; font-weight: 800; font-size: clamp(12px,2cqw,20px); line-height:1.4}
+.ms-portrait {width: clamp(32px,6.8cqh,55px); height: clamp(32px,6.8cqh,55px); border-radius: 13px; background:#c8ebe0; overflow: hidden; flex: none}
+.ms-portrait img {transform: scale(1.02) translateY(1%)}
+.ms-captain-action,.ms-send {
+  background: var(--ms-yellow);
+  border: 2px solid #fff3bd;
+  border-radius: 16px;
+  box-shadow: 0 4px #ba8e35,0 7px 10px #15465324;
+  font-weight: 900!important;
+}
+.ms-captain-action {display: flex; align-items:center; gap: .5em; justify-content:center; min-height: 48px; padding: .7em 1.1em; font-size: clamp(13px,2cqw,20px)!important}
+.ms-captain-action:active, .ms-send:active:not(:disabled) {transform: translateY(2px)}
+.ms-radio .ms-position-scene {bottom: 9%}
+.ms-location {position:absolute; width: min(29cqw,44cqh); aspect-ratio:480/280; bottom: 35%}
+.ms-location-boat {left: 11%}
+.ms-location-dock {right: 11%}
+.ms-location.spotlight::before {content:""; position:absolute; inset:-3% 8%; border: 4px dashed #fff0a3; border-radius:48%; box-shadow:0 0 22px #fff0a34f}
+.ms-location-boat .ms-location-object {position: absolute; inset:0; z-index:1}
+.ms-location img.ms-radio-animal {position:absolute; width:46%; height:68%; bottom:32%;left:33%;z-index:2; filter:drop-shadow(0 4px 2px #22475f24)}
+.ms-location-dock img.ms-radio-animal {bottom:41%;left:28%}
+.ms-location .ms-front-hull {position:absolute;inset:0;z-index:3;clip-path:polygon(0 62%,16% 57%,31% 61%,54% 59%,71% 53%,89% 44%,100% 45%,100% 100%,0 100%)}
+.ms-radio .ms-crew {width:min(18cqw,26cqh); height:min(15cqw,20cqh); bottom:35%}
+.ms-radio .ms-controls {flex-direction:column; gap:6px; bottom:3%}
+.ms-radio .ms-speech {padding: 3px 13px 3px 4px; border-radius: 13px}
+.ms-radio .ms-portrait {width:clamp(27px,5.3cqh,40px);height:clamp(27px,5.3cqh,40px);border-radius:9px}
+.ms-radio .ms-speech small {display:none}
+.ms-radio .ms-speech strong {font-size:clamp(12px,1.65cqw,16px)}
+.ms-console {pointer-events:auto; border-radius: 21px; background: #18516a; border:3px solid #c7efe8; box-shadow: 0 5px 0 #1a4654,0 6px 20px #174a6966; padding: clamp(5px,1.2cqh,12px); display:grid; gap: clamp(5px,1cqh,10px); width: min(740px,88cqw)}
+.ms-console-line {display:flex; align-items:stretch; gap:7px}
+.ms-slots {display:grid; grid-template-columns:1fr .65fr 1.22fr; gap:5px; flex:1; min-width:0}
+.ms-slot {display:flex; align-items:center; justify-content:center; gap:5px; min-width:0; min-height: clamp(40px,7.4cqh,60px); color:#d8f1ec!important; border:1.5px solid #66a2ac; border-radius:11px; background:#18465d; font-weight:750!important; font-size:clamp(12px,1.75cqw,17px)!important}
+.ms-slot.current {border:2px solid #ffdc70;background:#224d61}
+.ms-slot span {line-height:1.1}
+.ms-slot i {display:grid; place-items:center; font-style:normal; border-radius:50%; width:1.45em; height:1.45em; font-size:.85em; background:#3a7282}
+.ms-slot img.ms-word-img,.ms-word img.ms-word-img {width:clamp(23px,4.6cqh,39px);height:clamp(23px,4.6cqh,39px); flex:none}
+.ms-bank {display:flex;justify-content:center;gap:8px}
+.ms-word {display:inline-flex;align-items:center;justify-content:center;gap:6px; min-width:22%; min-height:clamp(43px,8cqh,63px); padding:2px 13px; border-radius:12px; border:2px solid #fff; background:#fff4d8; box-shadow:0 2px #c9ae74; font-family:Arial,sans-serif!important; font-size:clamp(14px,2.2cqw,21px)!important}
+.ms-word .ms-icon {color:#2c8591}
+.ms-send {display:flex;align-items:center;justify-content:center;gap:3px; padding:4px 11px; min-width:48px;font-size:clamp(12px,1.6cqw,16px)!important}
+.ms-send:disabled {background:#64818a; border-color:#8caaad; color:#dcf1ea; box-shadow:none}
+.ms-radio[data-phase="bell"] .ms-controls,.ms-radio[data-phase="board"] .ms-controls {flex-direction:row}
+.ms-radio:not([data-phase="compose"]) .ms-crew {bottom:16%;width:min(25cqw,39cqh);height:min(17cqw,28cqh)}
+.ms-sky-camera {--flight-from:50%;position:absolute;z-index:4;width:clamp(35px,8cqh,68px);aspect-ratio:1;left:var(--sky-x);bottom:68%;transform:translateX(-50%);pointer-events:none}
+.ms-sky-camera.to-boat {--sky-x:calc(11% + min(14.5cqw,22cqh))}
+.ms-sky-camera.to-dock {--sky-x:calc(89% - min(14.5cqw,22cqh))}
+.ms-world[data-phase="look"] .ms-sky-camera {animation:ms-scout .85s ease-out both}
+.ms-sky-camera span {display:block;position:relative;z-index:1;width:100%;height:100%;border:3px solid #fff7e1;border-radius:50%;overflow:hidden;background:#ffd2cc;box-shadow:0 3px #b36f67,0 6px 14px #17486738}
+.ms-sky-camera img {width:96%;height:96%;margin:3% auto 0}
+.ms-sky-beam {position:absolute;left:-36%;width:172%;height:14cqh;top:90%;background:linear-gradient(#fff5bdcf,#fffacc44);clip-path:polygon(48% 0,52% 0,100% 100%,0 100%)}
+.ms-boarding-plank {position:absolute;z-index:4;height:clamp(7px,1.7cqh,15px);transform-origin:left center;border-radius:6px;border:2px solid #836344;background:repeating-linear-gradient(90deg,#f1c989 0 12px,#b78d62 13px 15px);transform:rotate(var(--plank-angle));animation:ms-lower-plank .3s ease-out both}
+.ms-world img.ms-boarding-animal {position:absolute;z-index:5;object-fit:contain;transform-origin:50% 89%;animation:ms-embark .76s .30s ease-in-out both;pointer-events:none}
+@keyframes ms-scout {0%{left:var(--flight-from);translate:0 -8cqh}65%{translate:0 -2cqh}100%{left:var(--sky-x);translate:0 0}}
+@keyframes ms-lower-plank {from{transform:rotate(var(--plank-angle)) scaleX(.05)}to{transform:rotate(var(--plank-angle)) scaleX(1)}}
+@keyframes ms-embark {0%{transform:translate(0,0) scale(1)}43%{transform:translate(calc(var(--hop-x)*.43),calc(var(--hop-y)*.43 - 10px)) scale(.79)}100%{transform:translate(var(--hop-x),var(--hop-y)) scale(.58)}}
+@keyframes ms-arrive {from{left:var(--crew-from,var(--crew-x))}to{left:var(--crew-x)}}
+@keyframes ms-tap {50%{rotate:-5deg}}
+@keyframes ms-moor {60%,100%{transform: translateY(8%) scale(1.09)}}
+@media (prefers-reduced-motion: reduce) {
+  .ms-world *, .ms-world *::before {animation-duration: .01ms!important; transition-duration: .01ms!important}
+}
+@container (max-height:390px) and (min-aspect-ratio: 1/1) {
+  .ms-portrait {width:30px;height:30px}
+  .ms-scene-head {top:5%;left:4%}
+  .ms-scene-head h2 {font-size:clamp(18px,6.1cqh,24px)}
+  .ms-area-mark {font-size:10px}
+  .ms-speech {padding:3px 12px 3px 4px}
+  .ms-controls {bottom:3%}
+  .ms-radio[data-phase="compose"] .ms-controls {flex-direction:row;align-items:flex-end;gap:1.5cqw}
+  .ms-radio .ms-speech {max-width:19cqw;padding:4px 6px}
+  .ms-radio .ms-speech strong {font-size:11px}
+  .ms-radio .ms-speech .ms-portrait {display:none}
+  .ms-radio .ms-console {width:69cqw;border-radius:15px}
+  .ms-radio .ms-slot {min-height:34px}
+  .ms-radio .ms-word {min-height:38px}
+  .ms-radio .ms-position-scene {bottom:12%}
+  .ms-radio[data-phase="bell"] .ms-speech,.ms-radio[data-phase="board"] .ms-speech {position:static;max-width:none}
+}
+@container (max-aspect-ratio: 4/5) {
+  .ms-world {background-position:60% center}
+  .ms-scene-head {top:4%}
+  .ms-lane-0 {left:25%}
+  .ms-lane-1 {left:73%}
+  .ms-buoy {width:30cqw;height:38cqw;bottom:42%}
+  .ms-letter {font-size:17cqw}
+  .ms-color-boat {width:44cqw;height:31cqw;bottom:40%}
+  .ms-crew {width:54cqw;height:40cqw;bottom:16%}
+  .ms-controls,.ms-radio[data-phase="bell"] .ms-controls,.ms-radio[data-phase="board"] .ms-controls {flex-direction:column}
+  .ms-captain-action {min-height:44px}
+  .ms-radio .ms-controls {left:2%;right:2%;bottom:3%}
+  .ms-console {width:96cqw}
+  .ms-location {width:42cqw;bottom:40%}
+  .ms-location-boat {left:4%}
+  .ms-location-dock {right:4%}
+  .ms-sky-camera {bottom:66%}
+  .ms-sky-camera.to-boat {--sky-x:25%}
+  .ms-sky-camera.to-dock {--sky-x:75%}
+  .ms-radio .ms-crew {width:40cqw;height:29cqw;bottom:30%}
+  .ms-radio:not([data-phase="compose"]) .ms-crew {bottom:20%;width:47cqw;height:33cqw}
+  .ms-slot {flex-direction:column;gap:1px}
+  .ms-send {flex-direction:column}
+}
