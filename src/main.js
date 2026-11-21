@@ -19,7 +19,9 @@ const mast=document.querySelector('#mast');
 const book=document.querySelector('#book');
 const audio=createAudio();
 audio.setMuted(save.muted);
-const art=name=>window.rescueAsset?.('art/'+name+'.webp') ?? './art/'+name+'.webp';
+// CSS custom properties resolve relative URLs against the compiled stylesheet.
+// Provide a document-based URL so CSS backgrounds and image elements share the same art.
+const art=name=>window.rescueAsset?.('art/'+name+'.webp') ?? new URL('art/'+name+'.webp',document.baseURI).href;
 const image=(name, cls='',alt='')=>'<img draggable="false" class="'+cls+'" src="'+art(name)+'" alt="'+alt+'">';
 let stage='home', current=null, world=null, run=null, launchTimer=0, returnFocus=null;
 let notes=[];
