@@ -1,0 +1,142 @@
+/* Each station places the selectable real-world objects around one working toy. */
+.vocab-scene.ws-scene {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
+  align-items: center; justify-items: center; align-content: stretch; justify-content: stretch;
+  gap: clamp(3px, .9vh, 10px); padding: clamp(6px, 1.5vh, 16px) 3vw;
+  overflow: hidden; isolation: isolate;
+}
+.ws-scene .vocab-heading { padding: 5px 16px; }
+.ws-scene .vocab-heading h2 { font-size: clamp(19px, 4vh, 34px); }
+.ws-scene .vocab-footer { padding: 5px 14px; }
+.ws-scene .vocab-footer .go { margin-top: 4px; }
+.ws-scene .ws-play { width: min(100%, 780px); height: 100%; min-height: 0; position: relative; container-type: size; }
+section .ws-play .vocab-options {
+  width: 100%; max-width: none; height: 55%; margin: 0; padding: 0;
+  border: 0; background: none; box-shadow: none; gap: min(8cqw, 10cqh);
+}
+section .ws-play .vocab-object {
+  width: min(35cqw, 48cqh); height: min(35cqw, 48cqh);
+  min-width: 48px; min-height: 48px; padding: 0; flex-shrink: 0; overflow: visible;
+  border: 0; border-radius: 20%; background: radial-gradient(ellipse at 50% 65%, #fffbeedb, #fff8e733 63%, transparent 74%);
+  box-shadow: none; isolation: isolate; touch-action: manipulation;
+}
+.ws-play .vocab-object::before,.ws-play .vocab-object::after { display: none; }
+.ws-play .vocab-object .object-art { position: relative; z-index: 1; width: 92%; height: 89%; transform: none; }
+.ws-play .vocab-object:focus-visible,.ws-machine:focus-visible { outline: 4px solid #fbc842; outline-offset: 0; }
+.ws-play .vocab-object.picked { outline: none; }
+.ws-play .vocab-object:disabled,.ws-machine:disabled { opacity: 1; }
+.ws-play .vocab-object .word-label {
+  padding: 1px 9px; bottom: -2px; right: 8%; border: 1px solid #f8f3e9;
+  box-shadow: 0 2px 5px #14323428; font-size: clamp(12px, 2.8cqh, 18px);
+}
+.ws-play .vocab-object.picked .word-label { background: #167668; color: white; }
+.ws-machine {
+  position: absolute; display: grid; place-items: center; left: 50%; bottom: 1%;
+  transform: translateX(-50%); width: min(54cqw, 76cqh); height: 43%; padding: 0;
+  background: none; border: none; border-radius: 18px; overflow: visible;
+  color: #184b5f; cursor: default; z-index: 1;
+}
+.ws-machine:before {
+  content: ''; position: absolute; left: 17%; right: 17%; bottom: 5%; height: 22%;
+  border-radius: 50%; background: radial-gradient(ellipse,#44554561,transparent 72%);
+}
+.ws-machine.ws-active { cursor: pointer; touch-action: manipulation; }
+.ws-machine.ws-active:after {
+  content: ''; position: absolute; inset: 1% 12% 3%; z-index: -1;
+  border-radius: 50%; background: radial-gradient(ellipse, #ffe16ca8 20%,#ffe9946e 44%, transparent 71%);
+  animation: ws-breathe 1.35s ease-in-out infinite;
+}
+.ws-machine .ws-prop {
+  display: block; width: 83%; height: 100%; object-fit: contain; position: relative;
+  filter: drop-shadow(0 3px 3px #1b38363b); pointer-events: none;
+}
+.ws-machine .ws-use {
+  position: absolute; z-index: 5; bottom: 0; left: 50%; transform: translateX(-50%);
+  border: 2px solid #fff3c4; border-radius: 20px; padding: 3px 12px;
+  color: #4f3716; background: #ffda75; box-shadow: 0 2px 0 #ad8132;
+  white-space: nowrap; font-size: clamp(13px, 3.2cqh, 18px);
+}
+.ws-scene .cargo-item .swatch { height: 100%; width: 100%; }
+.ws-scene .ws-machine > i,.ws-scene .ws-machine img:not(.ws-prop) { position: absolute; pointer-events: none; }
+.ws-scene .ws-machine > img:not(.ws-prop) { object-fit: contain; }
+
+.ws-kite i.swatch.ws-kite {
+  width: 76%; height: 90%; filter: drop-shadow(0 3px 2px #4c52654d);
+}
+i.swatch.ws-kite:before {
+  content: ''; position: absolute; inset: 2% 9% 22%;
+  clip-path: polygon(50% 0%, 100% 38%, 50% 100%, 0% 38%);
+  background: conic-gradient(from 180deg at 50% 38%, transparent 60deg,#ffffff3b 60deg 180deg,#0001 180deg 240deg,transparent 240deg), var(--swatch);
+}
+i.swatch.ws-kite:after {
+  content: ''; position: absolute; top: 72%; left: 44%; height: 26%; width: 15%;
+  border-left: 2px solid #fff0b4; border-bottom: 2px solid #fff0b4; border-radius: 0 0 0 70%;
+}
+.ws-flag .ws-machine .ws-prop,.ws-lamp .ws-machine .ws-prop { transform: translateX(-14%); }
+.ws-flag .ws-rope { width: 4%; height: 74%; top: 7%; left: 56%; border-radius: 5px; background: repeating-linear-gradient(135deg,#81532b 0 4px,#f1c67b 4px 8px); }
+.ws-flag .ws-rope:after { content: ''; position:absolute; bottom:0; left:-5px; width:16px; height:11px; border:3px solid #b47f3e; border-radius:50%; }
+.ws-flag .ws-lifted { left: 51%; top: 1%; width: 37%; height: 50%; animation: ws-rise .62s both; }
+.ws-lifted .swatch,.ws-flying .swatch,.ws-thrown .swatch { width:100%; height:100%; }
+.ws-kite .ws-flying { right: -5%; top: -20%; width: 46%; height: 63%; animation: ws-kite-up .66s ease-out both; }
+.ws-lamp .ws-lamp.swatch {
+  width:68%; aspect-ratio:1; border: max(5px,1cqh) solid #315b69; border-radius:50%;
+  background:radial-gradient(circle at 33% 25%,#fff9,transparent 28%),radial-gradient(ellipse at 50% 65%,#fff2,transparent 53%),var(--swatch);
+  box-shadow:inset 0 -6px 9px #303f5144,0 5px 0 #b1d3ce,0 8px 0 #3f636a;
+}
+.ws-lamp .ws-beam { left:48%; top:1%; width: 66%; height:65%; background:linear-gradient(90deg,var(--swatch),transparent); clip-path:polygon(0 45%,100% 0,100% 100%,0 55%); animation:ws-flash .35s ease-out; }
+.ws-lamp .ws-sailing { bottom:0; right:0; width:46%; height:35%; animation:ws-sail .70s both; }
+.ws-ring .ws-thrown { left:38%; top:20%; width:28%; height:37%; animation:ws-toss .65s ease-out both; }
+
+.ws-tree .ws-plant { position: absolute; inset:0; width:100%; height:100%; object-fit:contain; z-index:0; pointer-events:none; }
+.ws-tree .ws-play .vocab-object { background:none;touch-action:none; }
+.ws-tree .ws-play .vocab-object .object-art { width:44%; height:45%; margin-top:-11%; filter:drop-shadow(0 2px 2px #1f443b57); }
+.ws-tree .picked .ws-plant { animation:ws-shake .48s; }
+.ws-tree .ws-catch { width:42%; height:53%; left:28%; bottom:30%; animation:ws-toss .65s ease-out both; }
+.ws-scale .ws-weigh { width:45%; height:54%; top:-26%; left:25%; animation:cargo-in .3s both; }
+.ws-scale .ws-dial { top:57%; left:46%; height:16%; width:2%; background:#c73f49; transform-origin:center bottom; transform:rotate(48deg); border-radius:4px; animation:ws-weigh .56s both; }
+.ws-juice .ws-blend { left:32%; top:25%; width:29%; height:35%; animation:cargo-in .3s; }
+.ws-juice .ws-juice { left:22%; top:36%; width:31%; height:25%; background:linear-gradient(150deg,#ffffff47,transparent),var(--juice); clip-path:polygon(0 0,100% 0,85% 100%,16% 100%); border-radius: 7%; transform-origin:bottom; animation:ws-fill .5s ease-out; }
+.ws-juice .ws-landed .ws-prop { animation:ws-shake .35s; }
+.ws-cool .ws-packed { left:36%; top:25%; width:27%; height:32%; animation:cargo-in .35s; }
+.ws-cool .ws-landed .ws-prop { animation:ws-close .38s; }
+.ws-serve .ws-plate { left:43%; bottom:2%; width:45%; height:26%; border-radius:50%; background:linear-gradient(#fffdf5,#96d6d5); box-shadow:0 4px 0 #77b4b5; animation:ws-serve .55s both; }
+.ws-serve .ws-plate img { width:75%; height:260%; bottom:8%; left:12%; object-fit:contain; }
+
+.ws-photo .ws-play .vocab-options { background:linear-gradient(90deg,#e8d2a6,#faf0d7 49%,#ac825c 50%,#f9ebcb 51%,#e8d2a6); border:2px solid #d0a775; border-radius:16px; box-shadow:0 4px 0 #a07853; }
+.ws-photo .ws-play .vocab-object,.ws-party .ws-play .vocab-object,.ws-gift .ws-play .vocab-object,.ws-ticket .ws-play .vocab-object {
+  border:3px solid #fff9e8; background: radial-gradient(ellipse at 42% 12%,#fff7d7,#d9ad89);
+  box-shadow:0 4px 0 #9a755f; max-height:90%; border-radius:14px;
+}
+.ws-photo .ws-play .vocab-object .object-art,.ws-party .ws-play .vocab-object .object-art,.ws-gift .ws-play .vocab-object .object-art,.ws-ticket .ws-play .vocab-object .object-art { height:94%; object-fit:contain; }
+.ws-machine .ws-print { right:1%; top:8%; width:45%; height:72%; background:#fff9df; border:4px solid white; padding:3px; transform:rotate(8deg); box-shadow:0 3px 5px #39281849; animation:ws-print .61s ease-out; }
+.ws-machine .ws-print img { position:static!important; width:100%; height:100%; object-fit:contain; }
+.ws-photo .ws-landed .ws-prop { animation:ws-flash .32s; }
+.ws-gift .ws-play .ws-given,.ws-ticket .ws-play .ws-given { position:absolute; z-index:3; bottom:8%; left:8%; width:37%; height:37%; object-fit:contain; animation:ws-serve .48s both; }
+.ws-gift .ws-carrying .ws-prop { transform:rotate(-12deg) scale(.9); }
+.ws-machine .ws-hand { bottom:4%; right:15%; background:#14786b; border:2px solid white; border-radius:50%; padding:1px 6px; color:#fff; }
+.ws-ticket .ws-ticket-boat { bottom:0%; right:0%; width:55%; height:62%; animation:ws-sail .72s; }
+.ws-party .ws-seated { top:-6%; left:24%; height:91%; width:50%; animation:ws-close .40s; }
+.ws-board .ws-passenger { top:0%; left:37%; height:57%; width:33%; animation:ws-toss .52s; }
+.ws-locate .ws-harbor-target { right:-3%; bottom:5%; width:52%; height:63%; }
+.ws-machine .ws-pin { right:14%; top:-2%; font:900 clamp(25px,9cqh,52px)/1 Arial; color:#d73f39; text-shadow:0 2px 0 white; z-index:2; animation:ws-close .45s; }
+@keyframes ws-breathe {50%{transform:scale(1.08);opacity:.65}}
+@keyframes ws-rise {from{transform:translateY(90%)}}
+@keyframes ws-kite-up {from{transform:translate(-55%,90%) rotate(-20deg);opacity:.45}}
+@keyframes ws-sail {from{transform:translateX(60%)}}
+@keyframes ws-toss {0%{transform:translate(-100%,-20%) scale(.65);opacity:.1}45%{transform:translate(-40%,-80%)}}
+@keyframes ws-shake {25%{transform:rotate(-6deg)}65%{transform:rotate(5deg)}}
+@keyframes ws-weigh {from{transform:rotate(-40deg)}}
+@keyframes ws-fill {from{transform:scaleY(.07)}}
+@keyframes ws-close {from{transform:translateY(-16%) scale(.94)}}
+@keyframes ws-serve {from{transform:translateX(-65%) rotate(-12deg);opacity:.25}}
+@keyframes ws-print {from{transform:translate(-45%,45%) scale(.25) rotate(-9deg);opacity:.12}}
+@keyframes ws-flash {0%{filter:brightness(1.9)}}
+@media(orientation:landscape) and (max-height:570px) {
+  .vocab-scene.ws-scene {grid-template-columns: minmax(0,1fr) minmax(140px,27%); grid-template-rows:auto minmax(0,1fr); gap:4px 2%;padding:5px 2vw;}
+  .ws-scene .vocab-heading,.ws-scene .vocab-footer{grid-column:2; min-width:0; width:100%; max-width:none; padding:5px 7px;}
+  .ws-scene .vocab-heading{grid-row:1;align-self:end}.ws-scene .vocab-heading h2{font-size:17px}.ws-scene .mimi-portrait{width:31px;height:31px}
+  .ws-scene .ws-play{grid-row:1 / 3;grid-column:1;}
+  .ws-scene .vocab-footer{grid-row:2;align-self:start}.ws-scene .vocab-footer p{font-size:12px}
+  .ws-scene .vocab-footer .go{padding:6px 8px;min-height:34px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce) { .ws-scene *, .ws-scene *:before,.ws-scene *:after {animation:none!important;transition:none!important;} }

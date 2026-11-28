@@ -17,7 +17,6 @@ function glyph(name) {
 }
 
 const missionInfo = {
-  letters: ['雾里的鸭宝宝', '路马'],
   colors: ['红蓝引航船', '路马'],
   radio: ['空中的小电台', '天天']
 };
@@ -29,19 +28,15 @@ const sentenceKey = {
   cat: {inBoat:'catBoat', onDock:'catDock'}
 };
 
-export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, finish, art, saved, record}) {
+export function startMission({id, root, speak, stopAudio, finish, art, saved, record}) {
   if (!missionInfo[id]) throw new Error('Unknown mission: ' + id);
-  if (id === 'letters' && (!Array.isArray(pair) || pair.length !== 2 || pair[0] === pair[1] || !pair.every(v=>typeof v === 'string' && /^[a-z]$/.test(v)))) {
-    throw new Error('A letter lesson requires two different lowercase letters.');
-  }
   const visits = Number(saved?.visits || 0);
   const world = document.createElement('section');
   world.className = 'ms-world ms-' + id;
   world.style.backgroundImage = 'url("' + art('harbor') + '")';
-  world.style.setProperty('--buoy-art', 'url("' + art('buoy') + '")');
   root.replaceChildren(world);
   let finished = false;
-  let phase = id === 'radio' ? 'compose' : id === 'colors' ? 'explore' : 'choose';
+  let phase = id === 'radio' ? 'compose' : 'explore';
   let round = 0;
   let stepTimer, hintTimer;
   let actionVersion = 0;
@@ -51,7 +46,6 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
   let hints = 0;
   let showHint = false;
   let destination = '';
-  let lastChoice = '';
   let crewX = 48;
   let previousCrewX = crewX;
   const knownColors = new Set();
@@ -59,10 +53,6 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
   const words = ['', '', ''];
   const radioMap = visits % 2 ? {cat:'inBoat', duck:'onDock'} : {duck:'inBoat', cat:'onDock'};
   const colors = visits % 2 ? ['blue', 'red'] : ['red', 'blue'];
-  const reversePair = id === 'letters' ? [pair[1], pair[0]] : [];
-  const practiceLanes = visits % 2 ? reversePair : pair;
-  const listeningLanes = visits % 2 ? pair : reversePair;
-  const letterCalls = id === 'letters' ? [...pair, ...(Math.random() < .5 ? pair : reversePair)] : [];
   let currentAudio = [];
 
   function image(name, className = '') {
@@ -97,7 +87,6 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
     actionVersion++;
     showHint = false;
     note = '';
-    lastChoice = '';
   }
   function setupHint() {
     clearTimeout(hintTimer);
@@ -137,10 +126,9 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
     world.remove();
   }
   function target() {
-    return id === 'letters' ? letterCalls[round] : [colors[0], colors[0], colors[1]][round];
+    return [colors[0], colors[0], colors[1]][round];
   }
   function lanes() {
-    if (id === 'letters') return round < 2 ? practiceLanes : listeningLanes;
     if (phase === 'explore' || round === 0) return ['red','blue'];
     return ['blue','red'];
   }
@@ -149,36 +137,21 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
     if (phase === 'bell') return '小队到齐！按船铃回塔。';
     if (phase === 'board') return '找到啦！放下踏板接它上船。';
     if (phase === 'boarding') return '踏板放好啦，小伙伴正在上船。';
-    if (phase === 'moving') {
-      if (id === 'colors') return '引航灯亮了，小船正在靠岸。';
-      return round < 2 ? '浮台的灯亮啦！' : '路马出发，靠岸接朋友！';
-    }
+    if (phase === 'moving') return '引航灯亮了，小船正在靠岸。';
     if (phase === 'look') return '天天去看看，听听现场回报。';
-    if (id === 'letters') return round < 2 ? '听听 '+target().toUpperCase()+'，点亮它的浮台。' : '听电台，找到呼叫的浮台。';
     if (id === 'colors') return phase === 'explore' ? '点一点两艘船，听听颜色。' : '听请求，点亮那艘船的引航灯。';
     if (words.every(Boolean)) return '消息组好了，点对讲机发送。';
     return ['谁在等我们？先选一位小伙伴。','点连接词，把消息接起来。','它在哪里？选一个地点。'][slot];
   }
   function heroPanel() {
     const total = id === 'radio' ? 2 : 4;
-    let progress = id === 'colors' ? (phase === 'explore' ? 0 : round + 1) : id === 'radio' ? aboard.size : round;
+    let progress = id === 'colors' ? (phase === 'explore' ? 0 : round + 1) : aboard.size;
     if (phase === 'bell') progress = total;
     const dots = Array.from({length:total}, (_, i) => '<i class="' + (i < progress ? 'done' : i === progress ? 'now' : '') + '"></i>').join('');
-    const label=id==='letters'?'字母浮台 · '+pair.join(' / ').toUpperCase():'冒险湾码头';
-    return '<header class="ms-scene-head"><div class="ms-area-mark">' + glyph('pin') + '<span>'+label+'</span></div><h2>' + missionInfo[id][0] + '</h2><div class="ms-progress" aria-label="任务进度 ' + progress + ' / ' + total + '">' + dots + '</div></header>';
+    return '<header class="ms-scene-head"><div class="ms-area-mark">' + glyph('pin') + '<span>冒险湾码头</span></div><h2>' + missionInfo[id][0] + '</h2><div class="ms-progress" aria-label="任务进度 ' + progress + ' / ' + total + '">' + dots + '</div></header>';
   }
   function speechLine() {
     return '<div class="ms-speech" aria-live="polite"><span class="ms-portrait">' + image(id === 'radio' ? 'skye':'zuma') + '</span><div><small>' + missionInfo[id][1] + ' · 现场电台</small><strong>' + stageInstruction() + '</strong></div></div>';
-  }
-  function letterWorld() {
-    return '<div class="ms-lanes">' + lanes().map((v, i) => {
-      const lit = phase === 'moving' && destination === v;
-      const active = phase === 'choose';
-      const guided = active && (round < 2 || showHint) && target() === v;
-      const fog = round >= 2 && !lit && phase !== 'bell';
-      const letter = v.toUpperCase();
-      return '<button type="button" class="ms-buoy ms-lane ms-lane-' + i + (lit ? ' lit':'') + (guided ? ' guide':'') + (lastChoice === v ? ' inspect':'') + '" data-act="choose" data-v="' + v + '" aria-label="浮台 ' + letter + '"' + (!active?' disabled':'') + '><span class="ms-beam"></span><span class="ms-buoy-light"></span><b class="ms-letter">' + letter + '</b><span class="ms-float"><i></i></span>' + (fog ? '<i class="ms-mist"></i>' : !aboard.has(v) ? image('duck','ms-buoy-duck'):'') + '</button>';
-    }).join('') + '</div>';
   }
   function colorWorld() {
     return '<div class="ms-lanes">' + lanes().map((v, i) => {
@@ -231,7 +204,7 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
     const focusValue = focusAction ? prev.dataset.v : '';
     world.dataset.phase = phase;
     world.dataset.round = round;
-    world.innerHTML = heroPanel() + (id==='radio'?radioWorld():id==='colors'?colorWorld():letterWorld()) + crew() + '<div class="ms-controls">' + speechLine() + (id==='radio' && phase === 'compose' ? radioConsole() : endButton()) + '</div>';
+    world.innerHTML = heroPanel() + (id==='radio'?radioWorld():colorWorld()) + crew() + '<div class="ms-controls">' + speechLine() + (id==='radio' && phase === 'compose' ? radioConsole() : endButton()) + '</div>';
     if (focusAction) {
       const selector = '[data-act="' + focusAction + '"]' + (focusValue === undefined ? '' : '[data-v="' + focusValue + '"]');
       world.querySelector(selector)?.focus({preventScroll:true});
@@ -255,31 +228,27 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
     }
     if (phase !== 'choose') return;
     transition();
-    lastChoice = v;
     if (v !== target()) {
       mistakes++;
       showHint = mistakes >= 2;
       if (showHint) hints++;
-      note = id === 'letters' ? '看看这个浮台，再听一次呼叫。' : '看看这艘船，再听听船长的请求。';
+      note = '看看这艘船，再听听船长的请求。';
       draw();
-      narrate(id === 'letters' ? ['checkLetter', target()] : ['checkColor', target()+'Boat']);
+      narrate(['checkColor', target()+'Boat']);
       setupHint();
       return;
     }
-    if (id === 'letters') observe('letter-'+v.toUpperCase(),v.toUpperCase(),round<2);
-    else observe('color-'+v,sampleText[v]);
+    observe('color-'+v,sampleText[v]);
     phase = 'moving';
     destination = v;
     crewX = lanes().indexOf(v) === 0 ? 32 : 68;
     draw();
     narrate(v);
     schedule(1350, () => {
-      if (id === 'letters' && round >= 2) aboard.add(v);
-      if (round === (id === 'letters' ? 3 : 2)) return setReady();
+      if (round === 2) return setReady();
       transition(); round++; phase = 'choose'; destination=''; crewX=50;
       draw();
-      if (id === 'letters') narrate(round===2 ? ['cnTryLetter',target()] : target());
-      else narrate(['colorListen', target()+'Boat']);
+      narrate(['colorListen', target()+'Boat']);
       setupHint();
     });
   }
@@ -377,7 +346,7 @@ export function startMission({id, pair = ['a', 'b'], root, speak, stopAudio, fin
   }
   world.addEventListener('click',click);
   draw();
-  narrate(id === 'letters'?['cnPracticeLetter',target()]:id === 'colors'?'colorIntro':['radioIntro',sentenceKey.duck[radioMap.duck]]);
+  narrate(id === 'colors'?'colorIntro':['radioIntro',sentenceKey.duck[radioMap.duck]]);
   setupHint();
   return {replay, dispose};
 }

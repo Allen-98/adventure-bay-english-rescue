@@ -13,6 +13,18 @@
 .path-steps button:disabled{background:#edf1ef;border-color:#d4dcd8;color:#596c70}
 .path-steps button.earned{background:#ddf2e9;color:#17655b;border-color:#a5cfc3}
 .path-steps svg{width:15px;height:15px}
+.is-orchard{background:radial-gradient(ellipse at 30% 15%,#fff5ba,#d3e4a0 58%,#a0c782)}
+.card-plank{position:absolute;left:0;bottom:2%;width:74%;height:84%;display:grid;place-items:center;transform:rotate(-9deg)}.card-plank img{inset:0;width:100%;height:100%}.card-plank b{z-index:1;color:#3b3326;font:900 clamp(17px,2vw,32px)/1 Arial,sans-serif;text-shadow:0 1px #ffe6a8}
+.card-apple{width:60%;height:79%;left:2%;bottom:1%;filter:drop-shadow(0 4px 2px #74532b45)}
+.card-banana{width:66%;height:77%;right:-2%;top:-3%;transform:rotate(10deg)}
+.path-steps b{font-family:"Trebuchet MS",sans-serif}
+@media(max-width:620px) and (orientation:portrait){
+  .hero{height:clamp(265px,37svh,365px)}
+  .hero .hero-boat{height:72%;width:63%;right:-6%;bottom:-3%}
+  .hero-inner{padding-top:16px}.hero h1{font-size:clamp(37px,10vw,52px)}
+  .hero .call-sign{left:auto;right:3%;bottom:6px}.hero .harbor-bell{right:3%;bottom:6px;min-height:38px}
+  .hero .hero-inner p{max-width:72%;margin-bottom:10px}
+}
 .vocab-scene{height:100%;display:flex;align-items:center;justify-content:space-around;flex-direction:column;gap:7px;background-size:cover;background-position:center;padding:clamp(8px,3vh,32px) 3vw}
 .vocab-heading,.vocab-footer{background:#fffbedf7;border-radius:17px;color:#17425b;text-align:center;padding:9px 19px;box-shadow:0 3px 0 #24557549}
 .vocab-heading small{color:#366b73}.vocab-heading h2{font-size:clamp(21px,3.5vw,40px);margin:0}
