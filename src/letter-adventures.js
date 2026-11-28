@@ -63,8 +63,15 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
   let note = '', hintTimer = 0, nextTimer = 0, strokeStart = null, ignoreClickUntil = 0;
   let audioKeys = [], showAnswer = '', tapCount = 0, liftTravel = '';
   let speechRun = 0, playingEcho = false;
+  let touchTap = null, fallbackTimer = 0;
   const installed = [];
 
+  function echoState(busy) {
+    playingEcho=busy;
+    world.dataset.echo=busy?'playing':'answer';
+    for(const drum of stage.querySelectorAll('.la-drum')) drum.disabled=busy||phase==='success'||phase==='beat';
+    if(phase==='choose') world.querySelector('.la-message strong').textContent=busy?'先听一听，鼓点来了。':'轮到你啦，敲回来！';
+  }
   async function say(keys) {
     audioKeys = Array.isArray(keys) ? keys : [keys];
     const token = ++speechRun;
@@ -76,7 +83,7 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
     // Demonstrate the instruments in order. Independent rounds give every drum
     // its own pitch but keep the correct drums visually unmarked.
     const sequence = [...audioKeys];
-    playingEcho=true;
+    echoState(true);
     for(const key of sequence) {
       if(disposed || token!==speechRun) return;
       const speaking=Promise.resolve(speak(key)).catch(()=>{});
@@ -89,7 +96,7 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
       }
       await speaking;
     }
-    if(token===speechRun) playingEcho=false;
+    if(token===speechRun) echoState(false);
   }
   function replay() { if (!disposed && audioKeys.length) say(audioKeys); }
   function sound(key = 'act' + game.toUpperCase()) { effect?.(key); }
@@ -110,7 +117,7 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
     return '<div aria-hidden="true" class="la-item la-prop '+cls+'" style="'+position(x,y,w,h)+'">'+inside+'</div>';
   }
   function button(action,value,label,inside,x,y,w,h,cls='',hint=false) {
-    const disabled = phase === 'success' || phase === 'beat';
+    const disabled = phase === 'success' || phase === 'beat' || game==='mn'&&playingEcho&&action==='letter';
     return '<button type="button" data-la="'+action+'" data-value="'+value+'" aria-label="'+label+'" class="la-item la-button '+cls+(hint && !disabled?' la-guide':'')+'" style="'+position(x,y,w,h)+'"'+(disabled?' disabled':'')+'>'+inside+'</button>';
   }
   function tag(v,small=false) { return '<b class="la-tag">'+(small?v:v.toUpperCase())+'</b>'; }
@@ -241,8 +248,8 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
     const done=round+(phase==='success'?1:0);
     progress.setAttribute('aria-label','完成 '+done+' / 4');
     progress.innerHTML=Array.from({length:4},(_,i)=>'<i class="'+(i<done?'la-done':i===round?'la-now':'')+'"></i>').join('');
-    const sample=guided() && phase==='choose' ? ' · '+target().toUpperCase() : '';
-    world.querySelector('.la-message strong').textContent=phase==='success'?praise:note || cue()+sample;
+    const sample=guided() && phase==='choose' ? target().toUpperCase()+'　' : '';
+    world.querySelector('.la-message strong').textContent=phase==='success'?praise:note || sample+cue();
     world.querySelector('.la-help').disabled=phase==='success'||phase==='beat';
   }
   function armHint() {
@@ -298,8 +305,19 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
     const route=strokes[target()];
     if (phase!=='trace'||Number(v)!==route[star]) return;
     star++; sound();
-    if (star===route.length) success();
-    else draw();
+    if (star===route.length && !strokeStart) return success();
+    // Keep the touched node mounted throughout a stroke. Replacing it can
+    // swallow touchend and the next tap in mobile browsers.
+    const visited=route.slice(0,star);
+    stage.querySelector('.la-lines .lit').setAttribute('points',visited.map(i=>starPoints[target()][i].join(',')).join(' '));
+    for(const point of stage.querySelectorAll('[data-la="star"]')) {
+      const index=Number(point.dataset.value), next=route[star]===index;
+      point.classList.toggle('la-next-star',next);
+      point.classList.toggle('la-lit-star',visited.includes(index));
+      point.classList.toggle('la-guide',next);
+      point.setAttribute('aria-label',next?'下一颗闪亮的星星':'星星');
+      point.textContent=next||visited.includes(index)?'★':'✦';
+    }
   }
   function choose(v) {
     if (phase!=='choose' || playingEcho) return;
@@ -321,6 +339,7 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
     const el=e.target.closest('button[data-la]');
     if(!el||el.disabled||disposed||phase==='success'||phase==='beat')return;
     if(performance.now()<ignoreClickUntil && e.detail!==0) return;
+    clearTimeout(fallbackTimer);
     const {la,value}=el.dataset;
     if(la==='hint')return hint();
     if(la==='letter')return choose(value);
@@ -343,8 +362,9 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
   function pointerDown(e) {
     const el=e.target.closest('[data-la]');
     if (!el || disposed || phase==='success' || (e.button!==undefined && e.button!==0)) return;
+    if(e.pointerType==='touch'&&!el.disabled) touchTap={id:e.pointerId,el,x:e.clientX,y:e.clientY};
     if (game==='wx'&&el.dataset.la==='letter' || game==='yz'&&phase==='trace'&&el.dataset.la==='star') {
-      strokeStart={x:e.clientX,y:e.clientY,v:el.dataset.value,id:e.pointerId,playing:false};
+      strokeStart={x:e.clientX,y:e.clientY,v:el.dataset.value,id:e.pointerId,playing:false,el};
       if (game==='yz') moveStar(el.dataset.value);
     }
   }
@@ -354,22 +374,44 @@ export function startLetterAdventure({lesson,root,art,speak,stopAudio,effect,fin
     if (Math.hypot(e.clientX-stroke.x,e.clientY-stroke.y)<15) return;
     stroke.playing=true;
     if(game==='wx'){
-      // A real wipe clears the panel in one stroke; tapping twice works as well.
-      if(stroke.v===target())tapCount=1;
-      choose(stroke.v); strokeStart=null; ignoreClickUntil=performance.now()+360;
+      if(stroke.v===target()) stroke.el.querySelector('.la-frost')?.classList.add('la-half-clear');
     } else if(phase==='trace'){
       const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-la="star"]');
       if(el)moveStar(el.dataset.value);
     }
   }
-  function pointerUp() {
-    if(strokeStart?.playing)ignoreClickUntil=performance.now()+360;
+  function pointerUp(e) {
+    const stroke=strokeStart;
+    if(touchTap && touchTap.id===e.pointerId) {
+      const {el,x,y}=touchTap;
+      touchTap=null;
+      if(e.type==='pointerup' && !stroke?.playing && el.dataset.la!=='star' && Math.hypot(e.clientX-x,e.clientY-y)<15) {
+        // Some mobile browsers suppress the compatibility click following a
+        // drag. Prefer the native click and recover a completed tap if needed.
+        clearTimeout(fallbackTimer);
+        fallbackTimer=window.setTimeout(()=>{
+          if(!disposed && world.contains(el) && !el.disabled) {
+            ignoreClickUntil=performance.now()+360; el.click();
+          }
+        },95);
+      }
+    }
+    if(!stroke||stroke.id!==e.pointerId)return;
     strokeStart=null;
+    if(stroke.playing)ignoreClickUntil=performance.now()+360;
+    if(game==='wx'&&stroke.playing&&e.type==='pointerup'){
+      if(stroke.v===target())tapCount=1;
+      choose(stroke.v);
+    } else if(game==='wx'&&e.type==='pointercancel'){
+      stroke.el.querySelector('.la-frost')?.classList.toggle('la-half-clear',Boolean(tapCount&&stroke.v===target()));
+    } else if(game==='yz'&&phase==='trace'&&star===strokes[target()].length){
+      success();
+    }
   }
   function dispose() {
     if(disposed)return;
     disposed=true;
-    clearTimeout(nextTimer);clearTimeout(hintTimer);
+    clearTimeout(nextTimer);clearTimeout(hintTimer);clearTimeout(fallbackTimer);
     world.removeEventListener('click',click);
     world.removeEventListener('pointerdown',pointerDown);
     window.removeEventListener('pointermove',pointerMove);

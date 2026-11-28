@@ -90,6 +90,8 @@
 .la-music-score{display:flex;gap:10%;justify-content:center;align-items:center}
 .la-music-score i{font:900 clamp(26px,min(8cqw,12cqh),60px)/1 "Trebuchet MS",sans-serif;color:#fffbdc;text-shadow:0 2px 2px #3b5483;background:#416d89e8;border:2px solid #fff1c4;box-shadow:0 3px 0 #385a6c;border-radius:50%;width:1.45em;height:1.45em;display:grid;place-items:center}
 .la-music-score i.done{background:#359f89}
+.la-mn[data-echo="playing"] .la-music-score i{background:#287e96;box-shadow:0 0 10px #fff2a8}
+.la-mn[data-echo="playing"] .la-drum.la-guide::after{opacity:.25}
 .la-drum .la-tag{top:60%}
 .la-strike img,.la-drum.la-hit img{animation:la-drumbeat .3s ease;transform-origin:50% 92%}
 @keyframes la-drumbeat{35%{transform:scale(1.1,.83)}}
